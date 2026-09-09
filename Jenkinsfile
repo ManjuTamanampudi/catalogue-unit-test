@@ -50,6 +50,19 @@ pipeline {
             }
 
         }
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy image \
+                    --scanners vuln \
+                    --vuln-type os \
+                    --severity MEDIUM,HIGH,CRITICAL \
+                    --format table \
+                    --exit-code 1 \
+                    ${ACC_ID}.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:latest
+                '''
+            }
+        }
         stage('Dependabot Security Scan') {
             steps {
                 withCredentials([string(credentialsId: 'github-token', variable: 'GITHUB_TOKEN')]) {
